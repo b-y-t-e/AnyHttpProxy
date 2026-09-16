@@ -60,8 +60,7 @@ Windows only (the port scanner and firewall integration use Windows APIs).
 
 ## Build
 
-Needs the .NET 10 SDK and Python 3, and the Tailcat.Link sources checked out next to this repository
-(`../tailcat-dotnet-lib`) - the library is built from source until its next release.
+Needs the .NET 10 SDK; release builds also need Python 3. Tailcat.Link comes from NuGet.
 
 ```bash
 dotnet build -c Release AnyHttpProxy.slnx

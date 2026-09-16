@@ -8,21 +8,19 @@ AnyHttpProxy exposes the HTTP/HTTPS services of one computer (**host**) on other
 (**gateways**), on the same ports, over **Tailcat.Link** (no IP, no open port). Sister project of
 AgentVirtualHand (same author, same look, same link library).
 
-One solution (`AnyHttpProxy.slnx`), .NET 10, Avalonia 12, Tailcat.Link **0.5.1**.
+One solution (`AnyHttpProxy.slnx`), .NET 10, Avalonia 12, Tailcat.Link **0.5.2** from NuGet.
 
-**Temporarily the library is built from source** at `../tailcat-dotnet-lib`
-(`UseLocalTailcat` defaults to `true` in `AnyHttpProxy.Core.csproj`; `-p:UseLocalTailcat=false` goes
-back to the NuGet package). Switch the default, and delete `Directory.Build.targets`, once a release
-carries what AnyHttpProxy now depends on:
+What the app relies on from that version, so nothing is worked around here:
 
 - relay liveness: a relay connection that silently stops carrying bytes is replaced in ~3 s;
 - resend: what a dead relay connection swallowed goes out again on the new one;
-- `msquic.dll` copied beside a single-file exe on publish (package `buildTransitive` targets);
-- faster return to a direct path, relay1 hello fix, relay notices in `ITailcatObserver`.
+- faster return to a direct path, relay notices in `ITailcatObserver`;
+- `msquic.dll` copied beside a single-file exe on publish (the package's `buildTransitive` targets).
 
 Measured against a server whose router cuts every TCP/UDP flow a few hundred KB in (relay reconnect
-every ~4-8 s): ~90 requests per 90 s through a tunnel with no failures and no session drops. Before
-these changes the session dropped every ~25 s.
+every ~4-8 s): typically 60-100 requests per 90 s through a tunnel with no failures and no session
+drops; that network varies a lot, so compare builds with several alternating runs. Before these
+library changes the session dropped every ~25 s.
 
 Link diagnostics: `AHP_LINK_LOG=<file>` writes the library log and relay/path events (`LinkTrace`);
 `AHP_FORCE_RELAY1=1` (with the log on) forces the relay1 transport to reproduce a QUIC-less host on
@@ -39,10 +37,10 @@ Projects:
 
 ## QUIC in single-file builds
 
-Single-file publish used to drop `msquic.dll`, leaving QUIC unsupported and every session on the
-relay. The Tailcat.Link package now copies it beside the exe on publish (its `buildTransitive`
-targets); while the library is referenced as source, `Directory.Build.targets` imports that same
-file. **Ship `msquic.dll` together with `ahp-host.exe` / `ahp-gateway.exe`.**
+A single-file publish would drop `msquic.dll`, leaving QUIC unsupported and every session on the
+relay. The Tailcat.Link package copies it beside the exe on publish, and the library logs a warning
+when a Windows that has QUIC reports none. **Ship `msquic.dll` together with `ahp-host.exe` /
+`ahp-gateway.exe`.**
 
 ## Build and release
 
