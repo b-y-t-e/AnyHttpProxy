@@ -6,21 +6,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>AnyHttpProxy</RootNamespace>
     <DebugType>embedded</DebugType>
-    <!-- Tymczasowo: biblioteka ze zrodel obok (poprawki relay1 i powiadomien DERP czekaja na wydanie).
-         -p:UseLocalTailcat=false wraca do pakietu z NuGet. -->
-    <UseLocalTailcat Condition="'$(UseLocalTailcat)' == ''">true</UseLocalTailcat>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(UseLocalTailcat)' != 'true'">
-    <PackageReference Include="Tailcat.Link" Version="0.5.1" />
-  </ItemGroup>
-
-  <!-- Źródła biblioteki z repo obok: D:\work\sources\tailcat-dotnet-lib. -->
-  <ItemGroup Condition="'$(UseLocalTailcat)' == 'true'">
-    <ProjectReference Include="..\..\..\tailcat-dotnet-lib\src\Tailcat.Link\Tailcat.Link.csproj" />
-    <ProjectReference Include="..\..\..\tailcat-dotnet-lib\src\Tailcat.Net\Tailcat.Net.csproj" />
-    <ProjectReference Include="..\..\..\tailcat-dotnet-lib\src\Tailcat.Derp\Tailcat.Derp.csproj" />
-    <ProjectReference Include="..\..\..\tailcat-dotnet-lib\src\Tailcat\Tailcat.csproj" />
+  <ItemGroup>
+    <!-- Pakiet sam kopiuje msquic.dll obok exe przy publikacji single-file (buildTransitive). -->
+    <PackageReference Include="Tailcat.Link" Version="0.5.2" />
   </ItemGroup>
 
 </Project>
