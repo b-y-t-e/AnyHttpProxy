@@ -1,0 +1,11 @@
+<Project>
+
+  <!--
+    Tailcat.Link ships this with its package (buildTransitive), so a PackageReference gets it for
+    free. It is imported here only while the library is referenced as source (UseLocalTailcat);
+    delete this file once AnyHttpProxy.Core goes back to the NuGet package.
+  -->
+  <Import Project="..\tailcat-dotnet-lib\src\Tailcat.Link\buildTransitive\Tailcat.Link.targets"
+          Condition="Exists('..\tailcat-dotnet-lib\src\Tailcat.Link\buildTransitive\Tailcat.Link.targets')" />
+
+</Project>

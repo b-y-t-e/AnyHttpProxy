@@ -1,0 +1,47 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Akcent motywu Fluent: bez tego suwak, przelacznik i focus sa systemowo fioletowe -->
+  <Color x:Key="SystemAccentColor">#4C8DFF</Color>
+  <Color x:Key="SystemAccentColorLight1">#6BA0FF</Color>
+  <Color x:Key="SystemAccentColorLight2">#8AB4FF</Color>
+  <Color x:Key="SystemAccentColorLight3">#A9C8FF</Color>
+  <Color x:Key="SystemAccentColorDark1">#3D7AE8</Color>
+  <Color x:Key="SystemAccentColorDark2">#2F63C4</Color>
+  <Color x:Key="SystemAccentColorDark3">#24509F</Color>
+
+  <SolidColorBrush x:Key="Bg">#0E1116</SolidColorBrush>
+  <SolidColorBrush x:Key="Raised">#12161D</SolidColorBrush>
+  <SolidColorBrush x:Key="Line">#1B212B</SolidColorBrush>
+  <SolidColorBrush x:Key="FieldLine">#232935</SolidColorBrush>
+  <SolidColorBrush x:Key="Text">#E6E9EF</SolidColorBrush>
+  <SolidColorBrush x:Key="Body">#D5DAE3</SolidColorBrush>
+  <SolidColorBrush x:Key="Soft">#8B95A7</SolidColorBrush>
+  <SolidColorBrush x:Key="Muted">#5C6474</SolidColorBrush>
+  <SolidColorBrush x:Key="Accent">#4C8DFF</SolidColorBrush>
+  <SolidColorBrush x:Key="Link">#A9D3FF</SolidColorBrush>
+  <SolidColorBrush x:Key="Ok">#63D19B</SolidColorBrush>
+  <SolidColorBrush x:Key="Warn">#FFB454</SolidColorBrush>
+  <SolidColorBrush x:Key="Danger">#FF7B72</SolidColorBrush>
+  <SolidColorBrush x:Key="DangerLine">#35222A</SolidColorBrush>
+
+  <!--
+    Pole tekstowe ma ramke ze wszystkich stron, a fokus zmienia jej kolor na akcent.
+    Wersja z samym podkresleniem przegrywala z ramka fokusu wbudowana w motyw Fluent,
+    wiec zamiast niespojnego efektu lepiej jest przyjac ramke swiadomie.
+  -->
+  <Thickness x:Key="TextControlBorderThemeThickness">1</Thickness>
+  <Thickness x:Key="TextControlBorderThemeThicknessFocused">1</Thickness>
+  <SolidColorBrush x:Key="TextControlBorderBrush">#232935</SolidColorBrush>
+  <SolidColorBrush x:Key="TextControlBorderBrushPointerOver">#2E3746</SolidColorBrush>
+  <SolidColorBrush x:Key="TextControlBorderBrushFocused">#4C8DFF</SolidColorBrush>
+  <SolidColorBrush x:Key="TextControlBackground">#12161D</SolidColorBrush>
+  <SolidColorBrush x:Key="TextControlBackgroundPointerOver">#161B24</SolidColorBrush>
+  <SolidColorBrush x:Key="TextControlBackgroundFocused">#161B24</SolidColorBrush>
+  <SolidColorBrush x:Key="TextControlForeground">#E6E9EF</SolidColorBrush>
+  <SolidColorBrush x:Key="TextControlForegroundPointerOver">#E6E9EF</SolidColorBrush>
+  <SolidColorBrush x:Key="TextControlForegroundFocused">#E6E9EF</SolidColorBrush>
+  <SolidColorBrush x:Key="TextControlPlaceholderForeground">#48505F</SolidColorBrush>
+  <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused">#48505F</SolidColorBrush>
+  <SolidColorBrush x:Key="TextControlSelectionHighlightColor">#26456F</SolidColorBrush>
+  </ResourceDictionary>

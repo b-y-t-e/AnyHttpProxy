@@ -1,0 +1,201 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!--
+    Wspólny wygląd obu aplikacji okienkowych. Zasada: monospace niesie dane techniczne
+    (adresy, kody, czasy), font interfejsowy niesie zdania. Akcent pojawia się w jednym
+    miejscu na ekran - przy akcji głównej albo przy żywym stanie.
+  -->
+
+  <!-- Etykieta pola: mała, wyciszona, bez wersalików -->
+  <Style Selector="TextBlock.k">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="Foreground" Value="{DynamicResource Muted}" />
+  </Style>
+
+  <!-- Wartość techniczna czytana wzrokiem, nie zdaniem -->
+  <Style Selector="TextBlock.val">
+    <Setter Property="FontSize" Value="12.5" />
+    <Setter Property="Foreground" Value="{DynamicResource Body}" />
+  </Style>
+
+  <!-- Proza: font interfejsowy i luźniejszy interlinia -->
+  <Style Selector="TextBlock.ui">
+    <Setter Property="FontFamily" Value="Segoe UI, Inter, sans-serif" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="LineHeight" Value="21" />
+    <Setter Property="Foreground" Value="{DynamicResource Soft}" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+    <Setter Property="MaxWidth" Value="520" />
+    <!-- Bez tego ograniczona szerokosc centruje caly blok tekstu -->
+    <Setter Property="HorizontalAlignment" Value="Left" />
+  </Style>
+
+  <Style Selector="Border.sep">
+    <Setter Property="Height" Value="1" />
+    <Setter Property="Background" Value="{DynamicResource Line}" />
+  </Style>
+
+  <!-- Przyciski: domyślnie ciche, akcent zarezerwowany dla jednej akcji na ekran -->
+  <Style Selector="Button">
+    <Setter Property="FontFamily" Value="Segoe UI, Inter, sans-serif" />
+    <Setter Property="Height" Value="32" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="FontSize" Value="12.5" />
+    <Setter Property="Padding" Value="14,0" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="#B9C2CF" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FieldLine}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+  <Style Selector="Button:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Raised}" />
+    <Setter Property="BorderBrush" Value="#33404F" />
+    <Setter Property="TextBlock.Foreground" Value="{DynamicResource Text}" />
+  </Style>
+  <Style Selector="Button:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="#0B0E13" />
+  </Style>
+  <Style Selector="Button:disabled /template/ ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="#1A202A" />
+    <Setter Property="TextBlock.Foreground" Value="#454D5C" />
+  </Style>
+
+  <Style Selector="Button.primary">
+    <Setter Property="Background" Value="{DynamicResource Accent}" />
+    <Setter Property="Foreground" Value="#07101E" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#6BA0FF" />
+    <Setter Property="TextBlock.Foreground" Value="#07101E" />
+  </Style>
+  <Style Selector="Button.primary:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="#3D7AE8" />
+  </Style>
+  <Style Selector="Button.primary:disabled /template/ ContentPresenter">
+    <Setter Property="Background" Value="#1B2836" />
+    <Setter Property="TextBlock.Foreground" Value="#4A5A70" />
+  </Style>
+
+  <!-- Odcięcie dostępu: czerwień dopiero pod kursorem, żeby nie krzyczała bez powodu -->
+  <Style Selector="Button.danger">
+    <Setter Property="Foreground" Value="#9AA4B4" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FieldLine}" />
+  </Style>
+  <Style Selector="Button.danger:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#1B1216" />
+    <Setter Property="BorderBrush" Value="{DynamicResource DangerLine}" />
+    <Setter Property="TextBlock.Foreground" Value="{DynamicResource Danger}" />
+  </Style>
+
+  <!-- Chip: maly tekstowy przycisk do paska stanu (np. przelacznik blokady) -->
+  <Style Selector="Button.chip">
+    <Setter Property="Height" Value="22" />
+    <Setter Property="Padding" Value="8,0" />
+    <Setter Property="FontSize" Value="11.5" />
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FieldLine}" />
+  </Style>
+  <Style Selector="Button.chip:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Raised}" />
+    <Setter Property="BorderBrush" Value="#33404F" />
+  </Style>
+
+  <!-- Przycisk bez ramki - do akcji drugorzędnych w wierszu listy -->
+  <Style Selector="Button.quiet">
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource Soft}" />
+    <Setter Property="Padding" Value="10,0" />
+  </Style>
+
+  <!--
+    Pole tekstowe: uniesione tło i cienka ramka, która przy fokusie zmienia kolor na akcent.
+    Kolory i grubości siedzą też w zasobach motywu (App.axaml) - szablon Fluenta bierze je
+    przez TemplateBinding i sam selektor by ich nie pokonał.
+  -->
+  <Style Selector="TextBox">
+    <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, monospace" />
+    <Setter Property="Background" Value="{DynamicResource Raised}" />
+    <Setter Property="Foreground" Value="{DynamicResource Text}" />
+    <Setter Property="CaretBrush" Value="{DynamicResource Accent}" />
+    <Setter Property="SelectionBrush" Value="#26456F" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FieldLine}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="Padding" Value="10,7" />
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="FontSize" Value="12.5" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+  </Style>
+  <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="#161B24" />
+    <Setter Property="BorderBrush" Value="#2E3746" />
+  </Style>
+  <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="#161B24" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+  </Style>
+  <Style Selector="TextBox:disabled /template/ Border#PART_BorderElement">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+  <Style Selector="TextBox /template/ TextBlock#PART_Watermark">
+    <Setter Property="Foreground" Value="#48505F" />
+  </Style>
+
+  <Style Selector="ComboBox">
+    <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, monospace" />
+    <Setter Property="Background" Value="{DynamicResource Raised}" />
+    <Setter Property="Foreground" Value="{DynamicResource Link}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FieldLine}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="Padding" Value="10,6" />
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="FontSize" Value="12.5" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+  </Style>
+  <Style Selector="ComboBox /template/ Border#Background">
+    <Setter Property="Background" Value="{DynamicResource Raised}" />
+  </Style>
+  <Style Selector="ComboBox:focus /template/ Border#Background">
+    <Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+  </Style>
+
+  <Style Selector="Slider">
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Margin" Value="0,-4" />
+  </Style>
+
+  <!-- Pasek przewijania nie powinien konkurować z treścią -->
+  <Style Selector="ScrollBar:vertical">
+    <Setter Property="Width" Value="8" />
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="ScrollBar:vertical /template/ Thumb">
+    <Setter Property="Background" Value="#232935" />
+    <Setter Property="CornerRadius" Value="4" />
+  </Style>
+  <Style Selector="ScrollBar:vertical:pointerover /template/ Thumb">
+    <Setter Property="Background" Value="#33404F" />
+  </Style>
+
+  <!-- Zasłona blokady wchodzi jednym spokojnym przejściem, bez efektów gdzie indziej -->
+  <Style Selector="Border.lock">
+    <Setter Property="Background" Value="{DynamicResource Bg}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="0:0:0.18" Easing="CubicEaseOut" />
+      </Transitions>
+    </Setter>
+  </Style>
+
+</Styles>

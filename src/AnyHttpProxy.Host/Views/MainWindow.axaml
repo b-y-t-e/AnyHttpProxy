@@ -1,0 +1,139 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AnyHttpProxy.HostApp.ViewModels"
+        xmlns:ui="using:AnyHttpProxy.UI"
+        x:Class="AnyHttpProxy.HostApp.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="AnyHttpProxy Host"
+        Width="820" Height="760"
+        MinWidth="680" MinHeight="560"
+        Background="{DynamicResource Bg}"
+        FontFamily="Cascadia Mono, Consolas, monospace"
+        FontSize="13">
+
+  <Grid RowDefinitions="Auto,*,Auto,Auto,Auto">
+
+    <!-- Status bar -->
+    <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,*,Auto,Auto" Height="44" Margin="24,0">
+      <TextBlock Grid.Column="0" Text="ahp host" FontSize="12.5" FontWeight="SemiBold"
+                 Foreground="{DynamicResource Text}" VerticalAlignment="Center" />
+      <TextBlock Grid.Column="1" Classes="k" FontSize="12" Margin="12,0,0,0"
+                 Text="{Binding MachineName}" VerticalAlignment="Center" />
+      <Ellipse Grid.Column="3" Width="6" Height="6" Fill="{Binding LinkAccent}" VerticalAlignment="Center" />
+      <TextBlock Grid.Column="4" Text="{Binding LinkStatus}" FontSize="12" Margin="8,0,0,0"
+                 Foreground="{Binding LinkAccent}" VerticalAlignment="Center" />
+    </Grid>
+    <Border Grid.Row="0" Classes="sep" VerticalAlignment="Bottom" />
+
+    <!-- Services -->
+    <Grid Grid.Row="1" RowDefinitions="Auto,*" Margin="24,18,24,0">
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,10">
+        <TextBlock Grid.Column="0" Classes="k" Text="http services on this computer" VerticalAlignment="Center" />
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12">
+          <TextBlock Classes="k" FontSize="12" VerticalAlignment="Center" Text="scanning..."
+                     IsVisible="{Binding IsScanning}" />
+          <TextBlock Classes="k" FontSize="12" VerticalAlignment="Center" Text="{Binding ServicesSummary}" />
+          <Button Classes="quiet" Content="Rescan" Click="OnRescan" />
+        </StackPanel>
+      </Grid>
+
+      <TextBlock Grid.Row="1" Classes="ui" VerticalAlignment="Top" IsVisible="{Binding ShowFirstScan}"
+                 Text="Looking for ports that answer HTTP or HTTPS..." />
+      <TextBlock Grid.Row="1" Classes="ui" VerticalAlignment="Top" IsVisible="{Binding ShowNoServices}"
+                 Text="No HTTP or HTTPS services are listening on this computer. Start your app and it shows up here within a few seconds." />
+
+      <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" IsVisible="{Binding HasServices}" Padding="0,0,12,0">
+        <ItemsControl ItemsSource="{Binding Services}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:ServiceRow">
+              <Grid ColumnDefinitions="Auto,8,70,64,*,Auto" Height="38">
+                <CheckBox Grid.Column="0" IsChecked="{Binding IsShared}" MinWidth="0" Padding="0"
+                          VerticalAlignment="Center" ToolTip.Tip="Share with gateways" />
+                <TextBlock Grid.Column="2" Text="{Binding PortText}" FontSize="13.5" FontWeight="SemiBold"
+                           Foreground="{DynamicResource Text}" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="3" Text="{Binding Scheme}" FontSize="12"
+                           Foreground="{Binding SchemeAccent}" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="4" Text="{Binding Detail}" FontSize="12" TextTrimming="CharacterEllipsis"
+                           Foreground="{DynamicResource Soft}" VerticalAlignment="Center" />
+                <Button Grid.Column="5" Classes="quiet" Content="Open" Click="OnOpenService"
+                        ToolTip.Tip="{Binding Url}" />
+                <Border Grid.Column="0" Grid.ColumnSpan="6" Classes="sep" VerticalAlignment="Bottom" />
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Grid>
+
+    <!-- Gateways -->
+    <Border Grid.Row="2" BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Margin="0,16,0,0">
+      <Grid RowDefinitions="Auto,Auto,Auto" Margin="24,16,24,0">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,10">
+          <TextBlock Grid.Column="0" Classes="k" Text="gateways" VerticalAlignment="Center" />
+          <Button Grid.Column="2" Classes="primary" Content="Invite gateway" Click="OnInvite"
+                  IsEnabled="{Binding IsRunning}" />
+        </Grid>
+
+        <!-- Invite code -->
+        <Border Grid.Row="1" IsVisible="{Binding HasInvite}" Background="{DynamicResource Raised}"
+                BorderBrush="{DynamicResource FieldLine}" BorderThickness="1" CornerRadius="3"
+                Padding="14,10" Margin="0,0,0,12">
+          <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,4,Auto">
+            <SelectableTextBlock Grid.Row="0" Grid.Column="0" Text="{Binding InviteCode}" FontSize="13"
+                                 AutomationProperties.Name="{Binding InviteCode}"
+                                 Foreground="{DynamicResource Link}" TextWrapping="Wrap" VerticalAlignment="Center" />
+            <Button Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Content="Copy" Margin="12,0,0,0"
+                    VerticalAlignment="Center" Click="OnCopyInvite" />
+            <TextBlock Grid.Row="2" Grid.Column="0" Classes="k" Text="{Binding InviteDetail}" />
+          </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="2">
+          <TextBlock Classes="ui" IsVisible="{Binding HasNoGateways}" Margin="0,0,0,4"
+                     Text="No gateways yet. Click Invite gateway and paste the code in AnyHttpProxy Gateway on the other computer. Several gateways can connect at once." />
+          <ScrollViewer MaxHeight="170" VerticalScrollBarVisibility="Auto" IsVisible="{Binding HasGateways}" Padding="0,0,12,0">
+            <ItemsControl ItemsSource="{Binding Gateways}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:GatewayRow">
+                  <Grid ColumnDefinitions="2,16,*,Auto,Auto" Height="44">
+                    <Border Grid.Column="0" Background="{Binding StatusAccent}" CornerRadius="1" Margin="0,10" />
+                    <TextBlock Grid.Column="2" Text="{Binding Name}" FontSize="13.5" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Text}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="3" Text="{Binding StatusText}" FontSize="12" Margin="0,0,12,0"
+                               Foreground="{Binding StatusAccent}" VerticalAlignment="Center" />
+                    <Button Grid.Column="4" Classes="danger" Content="Remove" Click="OnRemoveGateway" />
+                    <Border Grid.Column="2" Grid.ColumnSpan="3" Classes="sep" VerticalAlignment="Bottom" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- Log -->
+    <Grid Grid.Row="3" RowDefinitions="Auto,*" Margin="24,18,24,0" Height="140">
+      <TextBlock Grid.Row="0" Classes="k" Text="log" Margin="0,0,0,10" />
+      <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,12,0">
+        <ItemsControl ItemsSource="{Binding Logs}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="ui:LogEntry">
+              <Grid ColumnDefinitions="Auto,14,44,14,*" Margin="0,0,0,6">
+                <TextBlock Grid.Column="0" Text="{Binding Time}" FontSize="12" Foreground="{DynamicResource Muted}" />
+                <TextBlock Grid.Column="2" Text="{Binding Kind}" FontSize="12" HorizontalAlignment="Right"
+                           Foreground="{Binding Accent}" />
+                <TextBlock Grid.Column="4" Text="{Binding Message}" FontSize="12" TextWrapping="Wrap"
+                           Foreground="{DynamicResource Body}" />
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Grid>
+
+    <Border Grid.Row="4" BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Padding="24,14" Margin="0,12,0,0">
+      <TextBlock Classes="ui" FontSize="12.5" MaxWidth="740" Text="{Binding Hint}" />
+    </Border>
+  </Grid>
+</Window>

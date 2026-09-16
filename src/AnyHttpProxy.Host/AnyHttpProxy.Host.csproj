@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <AssemblyName>ahp-host</AssemblyName>
+    <RootNamespace>AnyHttpProxy.HostApp</RootNamespace>
+
+    <!-- Jeden plik .exe: biblioteki natywne (Skia, HarfBuzz, ANGLE) wciągnięte do bundla, symbole w środku. -->
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.2" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.2" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.2" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AnyHttpProxy.Core\AnyHttpProxy.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Wygląd i kawałki UI wspólne z gatewayem - edytuj oryginał w src/Shared. -->
+    <Compile Include="..\Shared\UI\*.cs" Link="Shared\%(Filename)%(Extension)" />
+    <AvaloniaResource Include="..\Shared\Styles\*.axaml" Link="Styles\%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/AnyHttpProxy.Core/AnyHttpProxy.Core.csproj" />
+  <Project Path="src/AnyHttpProxy.Host/AnyHttpProxy.Host.csproj" />
+  <Project Path="src/AnyHttpProxy.Gateway/AnyHttpProxy.Gateway.csproj" />
+</Solution>

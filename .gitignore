@@ -1,0 +1,13 @@
+bin/
+obj/
+.vs/
+.idea/
+*.user
+publish/
+ahp-error.log
+
+# mTiles workspace state
+.mtiles/
+
+*.7z
+*.zip
