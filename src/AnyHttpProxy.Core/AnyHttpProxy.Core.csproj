@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <!-- Pakiet sam kopiuje msquic.dll obok exe przy publikacji single-file (buildTransitive). -->
-    <PackageReference Include="Tailcat.Link" Version="0.5.2" />
+    <PackageReference Include="Tailcat.Link" Version="0.5.3" />
   </ItemGroup>
 
 </Project>

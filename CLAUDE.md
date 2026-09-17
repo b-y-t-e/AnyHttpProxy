@@ -8,7 +8,7 @@ AnyHttpProxy exposes the HTTP/HTTPS services of one computer (**host**) on other
 (**gateways**), on the same ports, over **Tailcat.Link** (no IP, no open port). Sister project of
 AgentVirtualHand (same author, same look, same link library).
 
-One solution (`AnyHttpProxy.slnx`), .NET 10, Avalonia 12, Tailcat.Link **0.5.2** from NuGet.
+One solution (`AnyHttpProxy.slnx`), .NET 10, Avalonia 12, Tailcat.Link **0.5.3** from NuGet.
 
 What the app relies on from that version, so nothing is worked around here:
 
