@@ -58,13 +58,25 @@ public static class WindowsFirewall
                     (int)rule.Profiles,
                     protocol == ProtocolTcp ? (string?)rule.LocalPorts ?? "*" : "*",
                     (string?)rule.ApplicationName,
-                    (string?)rule.serviceName));
+                    (string?)rule.serviceName,
+                    IsNarrowed(rule)));
             }
             catch
             {
                 // Pojedyncza nietypowa reguła nie psuje całej oceny.
             }
         }
+
+        // 1 = zasady domeny (GPO) nadpisują lokalne reguły, 2 = GPO blokuje cały ruch przychodzący.
+        // Wtedy reguły dodane tutaj nic nie zmienią - trzeba to powiedzieć wprost.
+        int modifyState = 0;
+        try { modifyState = policy.LocalPolicyModifyState; } catch { }
+        var policyNote = modifyState switch
+        {
+            1 => "; domain policy ignores firewall rules added on this computer - ask the administrator to open the port",
+            2 => "; domain policy blocks all incoming connections - ask the administrator to open the port",
+            _ => "",
+        };
 
         var blocked = new List<FirewallBlock>();
         foreach (var port in ports.Distinct().Order())
@@ -75,21 +87,54 @@ public static class WindowsFirewall
 
                 if (matching.FirstOrDefault(r => r.Action == ActionBlock) is { } block)
                 {
-                    blocked.Add(new FirewallBlock(port, $"blocked by the firewall rule \"{block.Name}\""));
+                    blocked.Add(new FirewallBlock(port, $"blocked by the firewall rule \"{block.Name}\"{policyNote}"));
                     break;
                 }
 
-                if (matching.Any(r => r.Action == ActionAllow)) continue;
+                // Zawężona reguła (inny adres lokalny, interfejs, aplikacja ze Sklepu) nie wpuszcza naszego portu w całości.
+                if (matching.Any(r => r.Action == ActionAllow && !r.Narrowed)) continue;
 
                 if ((int)policy.DefaultInboundAction[profile] == ActionBlock)
                 {
-                    blocked.Add(new FirewallBlock(port, $"no firewall rule allows it ({ProfileName(profile)} network)"));
+                    blocked.Add(new FirewallBlock(port, $"no firewall rule allows it ({ProfileName(profile)} network){policyNote}"));
                     break;
                 }
             }
         }
 
         return blocked;
+    }
+
+    /// <summary>
+    /// Włączone firewalle innych firm zarejestrowane w Centrum zabezpieczeń (np. ESET Zapora).
+    /// Taki firewall filtruje ruch sam i reguły Windows Firewall nic mu nie mówią, więc ocena powyżej
+    /// jest wtedy bez znaczenia. Na Windows Server Centrum zabezpieczeń nie istnieje - pusta lista.
+    /// </summary>
+    public static IReadOnlyList<string> OtherFirewalls()
+    {
+        var names = new List<string>();
+        try
+        {
+            var type = Type.GetTypeFromProgID("WbemScripting.SWbemLocator");
+            if (type is null) return names;
+
+            dynamic locator = Activator.CreateInstance(type)!;
+            dynamic service = locator.ConnectServer(".", "root\\SecurityCenter2");
+            foreach (dynamic product in service.ExecQuery("SELECT displayName, productState FROM FirewallProduct"))
+            {
+                string name = product.displayName;
+                int state = product.productState;
+                // Drugi bajt productState: 0x10 = włączony.
+                if ((state >> 8 & 0x10) != 0 && !name.Contains("Windows", StringComparison.OrdinalIgnoreCase))
+                    names.Add(name);
+            }
+        }
+        catch
+        {
+            // brak WMI / Centrum zabezpieczeń
+        }
+
+        return names;
     }
 
     /// <summary>
@@ -140,6 +185,42 @@ public static class WindowsFirewall
         }
     }
 
+    /// <summary>
+    /// Reguła ograniczona do części ruchu: adresów lokalnych (np. Tailscale-In tylko na adres tailnetu),
+    /// interfejsów albo kontenera aplikacji ze Sklepu (LocalUserOwner / LocalAppPackageId, bez ApplicationName).
+    /// </summary>
+    private static bool IsNarrowed(dynamic rule)
+    {
+        string? localAddresses = rule.LocalAddresses;
+        if (localAddresses is { Length: > 0 } and not "*") return true;
+
+        string? interfaceTypes = rule.InterfaceTypes;
+        if (interfaceTypes is { Length: > 0 } and not "All") return true;
+
+        try
+        {
+            object? interfaces = rule.Interfaces;
+            if (interfaces is Array { Length: > 0 }) return true;
+        }
+        catch
+        {
+            // brak listy interfejsów
+        }
+
+        try
+        {
+            string? owner = rule.LocalUserOwner;
+            string? package = rule.LocalAppPackageId;
+            if (owner is { Length: > 0 } || package is { Length: > 0 }) return true;
+        }
+        catch
+        {
+            // starszy Windows bez INetFwRule3
+        }
+
+        return false;
+    }
+
     private static string Quote(string text) => "'" + text.Replace("'", "''") + "'";
 
     private static string ProfileName(int profile) => profile switch
@@ -150,7 +231,7 @@ public static class WindowsFirewall
         _ => "current",
     };
 
-    private sealed record RuleView(string Name, int Action, int Profiles, string LocalPorts, string? Application, string? Service)
+    private sealed record RuleView(string Name, int Action, int Profiles, string LocalPorts, string? Application, string? Service, bool Narrowed)
     {
         public bool Applies(int port, int profile, string? programPath)
         {

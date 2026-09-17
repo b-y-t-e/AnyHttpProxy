@@ -286,11 +286,18 @@ public sealed class MainViewModel : ViewModelBase
         get => _firewallText;
         private set
         {
-            if (Set(ref _firewallText, value)) OnPropertyChanged(nameof(ShowFirewall));
+            if (Set(ref _firewallText, value))
+            {
+                OnPropertyChanged(nameof(ShowFirewall));
+                OnPropertyChanged(nameof(CanAllowFirewall));
+            }
         }
     }
 
     public bool ShowFirewall => _firewallText.Length > 0;
+
+    /// <summary>Przycisk "Allow in firewall" ma sens tylko dla Windows Firewall, nie dla firewalla innej firmy.</summary>
+    public bool CanAllowFirewall => _blockedPorts.Count > 0;
 
     public bool FirewallNotBusy => !_firewallBusy;
 
@@ -422,10 +429,24 @@ public sealed class MainViewModel : ViewModelBase
         var ports = _engine.ListeningPorts();
         try
         {
+            var others = await Task.Run(() => OperatingSystem.IsWindows() ? WindowsFirewall.OtherFirewalls() : []);
+            if (others.Count > 0 && ports.Count > 0)
+            {
+                // Firewalla innej firmy nie umiemy ocenić ani zmienić - mówimy, gdzie otworzyć porty.
+                var name = string.Join(", ", others);
+                var list = string.Join(", ", ports.Distinct().Order());
+                _blockedPorts = [];
+                FirewallText = $"{name} filters connections on this computer, so Windows Firewall rules do not apply. "
+                    + $"If other computers cannot connect, allow incoming TCP on ports {list} in {name} (or ask the administrator).";
+                OnPropertyChanged(nameof(CanAllowFirewall));
+                return;
+            }
+
             var blocked = await Task.Run(() => OperatingSystem.IsWindows()
                 ? WindowsFirewall.FindBlocked(ports, Environment.ProcessPath)
                 : []);
             _blockedPorts = blocked.Select(b => b.Port).ToList();
+            OnPropertyChanged(nameof(CanAllowFirewall));
             FirewallText = blocked.Count switch
             {
                 0 => "",
